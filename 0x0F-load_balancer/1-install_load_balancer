@@ -35,8 +35,8 @@ frontend http_front
 
 backend http_back
     balance roundrobin
-    server web01 [STUDENT_ID]-web-01:80 check
-    server web02 [STUDENT_ID]-web-02:80 check
+    server 530678-web-01 52.86.74.62:80 check
+    server 530678-web-02 100.25.192.229:80 check
 EOL
 
 # Restart HAproxy service
