@@ -39,4 +39,3 @@ frontend www-https
 backend www-backend
     server webserver1 52.86.74.62:80 check
     server webserver2 100.25.192.229:80 check
-
