@@ -1,16 +1,27 @@
 #!/usr/bin/env bash
-# print domains and subdomains
+# This script displays information about subdomains of a given domain
 
-print_domain_subdomain () {
-    dig "$1" | grep -A1 'ANSWER SECTION:' | sed -r "s/$1./$2/g" | awk -F" " ' NR==2 { print "The subdomain " $1 " is a " $4 " record and points to " $5 }'
+get_subdomain_info() {
+    local domain="$1"
+    local subdomain="$2"
+
+    if [[ -z "$subdomain" ]]; then
+        subdomains=("www" "lb-01" "web-01" "web-02")
+    else
+        subdomains=("$subdomain")
+    fi
+
+    for sub in "${subdomains[@]}"; do
+        record_type=$(dig "${sub}.${domain}" | awk '/ANSWER SECTION:/ {getline; print $4}')
+        destination=$(dig "${sub}.${domain}" | awk '/ANSWER SECTION:/ {getline; print $5}')
+        echo "The subdomain ${sub} is a ${record_type} record and points to ${destination}"
+    done
 }
 
-if [ "$#" -eq 2 ]
-then
-    print_domain_subdomain "$2.$1" "$2"
-else
-    print_domain_subdomain "www.$1" "www"
-    print_domain_subdomain "lb-01.$1" "lb-01"
-    print_domain_subdomain "web-01.$1" "web-01"
-    print_domain_subdomain "web-02.$1" "web-02"
+# Check if domain argument is provided
+if [[ -z "$1" ]]; then
+    echo "Usage: $0 <domain> [subdomain]"
+    exit 1
 fi
+
+get_subdomain_info "$1" "$2"
