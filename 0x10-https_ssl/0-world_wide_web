@@ -1,27 +1,18 @@
 #!/usr/bin/env bash
-# This script displays information about subdomains of a given domain
+# script to display subdomains info
 
-get_subdomain_info() {
-    local domain="$1"
-    local subdomain="$2"
-
-    if [[ -z "$subdomain" ]]; then
-        subdomains=("www" "lb-01" "web-01" "web-02")
-    else
-        subdomains=("$subdomain")
-    fi
-
-    for sub in "${subdomains[@]}"; do
-        record_type=$(dig "${sub}.${domain}" | awk '/ANSWER SECTION:/ {getline; print $4}')
-        destination=$(dig "${sub}.${domain}" | awk '/ANSWER SECTION:/ {getline; print $5}')
-        echo "The subdomain ${sub} is a ${record_type} record and points to ${destination}"
-    done
+dns_config () {
+    script=$(dig "$2"."$1" | grep -A1 'ANSWER SECTION:' | tr '\t' '\n' | tail -2 | tr '\n' ' ')
+    echo "$2 $script" | awk '{print "The subdomain " $1 " is a " $2 " record and points to " $3}'
 }
 
-# Check if domain argument is provided
-if [[ -z "$1" ]]; then
-    echo "Usage: $0 <domain> [subdomain]"
-    exit 1
+if [ "$#" == 1 ]
+then
+  dns_config "$1" "www"
+  dns_config "$1" "lb-01"
+  dns_config "$1" "web-01"
+  dns_config "$1" "web-02"
+elif [ "$#" == 2 ]
+then
+  dns_config "$1" "$2"
 fi
-
-get_subdomain_info "$1" "$2"
