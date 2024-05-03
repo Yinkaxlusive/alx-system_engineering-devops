@@ -1,44 +1,17 @@
 #!/usr/bin/env bash
-# This script installs and configures HAproxy on lb-01 server to distribute traffic to web-01 and web-02 using roundrobin algorithm
+# creating a load balancing
+sudo apt update
+sudo apt install -y haproxy
+sudo systemctl start haproxy
+sudo systemctl enable haproxy
 
-# Install HAproxy
-sudo apt-get update
-sudo apt-get install -y haproxy
+# Creating a backup of the configuration file
+sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.backup
 
-# Configure HAproxy
-sudo mv /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.backup  # Backup the original configuration file
+# Appending frontend configuration
+sudo sed -i "$ a\\\n\nfrontend myfrontend\n\tbind :80\n\tdefault_backend myservers" /etc/haproxy/haproxy.cfg
 
-# Create a new HAproxy configuration file
-cat <<EOL | sudo tee /etc/haproxy/haproxy.cfg
-global
-    log /dev/log    local0
-    log /dev/log    local1 notice
-    chroot /var/lib/haproxy
-    stats socket /run/haproxy/admin.sock mode 660 level admin
-    stats timeout 30s
-    user haproxy
-    group haproxy
-    daemon
+# Appending backend configuration
+sudo sed -i "$ a\\\n\nbackend myservers\n\tserver server1 107.23.92.1:80 check\n\tserver server2 100.26.249.41:80 check" /etc/haproxy/haproxy.cfg
 
-defaults
-    log global
-    mode http
-    option httplog
-    option dontlognull
-    timeout connect 5000
-    timeout client 50000
-    timeout server 50000
-
-frontend http_front
-    bind *:80
-    default_backend http_back
-
-backend http_back
-    balance roundrobin
-    server 530678-web-01 52.86.74.62:80 check
-    server 530678-web-02 100.25.192.229:80 check
-EOL
-
-# Restart HAproxy service
-sudo systemctl restart haproxy
-
+sudo service haproxy restart
