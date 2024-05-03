@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# This script displays information about subdomains of a given domain
+# Display information about subdomains of a given domain
 
 get_subdomain_info() {
     local domain="$1"
@@ -12,9 +12,13 @@ get_subdomain_info() {
     fi
 
     for sub in "${subdomains[@]}"; do
-        record_type=$(dig "${sub}.${domain}" | awk '/ANSWER SECTION:/ {getline; print $4}')
-        destination=$(dig "${sub}.${domain}" | awk '/ANSWER SECTION:/ {getline; print $5}')
-        echo "The subdomain ${sub} is a ${record_type} record and points to ${destination}"
+        # Use dig with +short option for compact output
+        result=$(dig +short "${sub}.${domain}")
+        if [[ -n "$result" ]]; then
+            echo "The subdomain ${sub} points to ${result}"
+        else
+            echo "No record found for subdomain ${sub}"
+        fi
     done
 }
 
@@ -23,3 +27,5 @@ if [[ -z "$1" ]]; then
     echo "Usage: $0 <domain> [subdomain]"
     exit 1
 fi
+
+get_subdomain_info "$1" "$2"
