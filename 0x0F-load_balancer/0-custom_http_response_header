@@ -1,8 +1,52 @@
 #!/usr/bin/env bash
-# configuring nginx
-sudo apt-get update -y
-sudo apt-get -y install nginx
-sudo service nginx start
+
+# Update and install Nginx
+sudo apt update
+sudo apt install nginx -y
+
+# Allow Nginx through the firewall
+sudo ufw allow 'Nginx HTTP'
+
+# Set ownership and permissions for website files
+sudo chown -R "$USER":"$USER" /var/www
+sudo chmod -R 755 /var/www
+
+# Create necessary directories if not present
+sudo mkdir -p /var/www/html/error
+
+# Create a default index page
 echo "Hello World!" | sudo tee /var/www/html/index.html
-sudo sed -i "s#server {#server {\n\tadd_header X-Served-By \$hostname;#" /etc/nginx/sites-enabled/default
-sudo service nginx restart
+
+# Create a custom error page
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/error/error_404.html
+
+# Backup the default Nginx configuration
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
+
+# Retrieve the hostname
+HOSTNAME=$(hostname)
+
+# Configure Nginx to include the custom HTTP response header with the hostname
+sudo bash -c "cat << EOF > /etc/nginx/sites-available/default
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+    server_name _;
+    add_header X-Served-By $HOSTNAME;
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+    error_page 404 /error/error_404.html;
+    location = /error/error_404.html {
+        internal;
+    }
+}
+EOF"
+
+# Enable the new configuration
+sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
+# Restart Nginx to apply changes
+sudo systemctl restart nginx
