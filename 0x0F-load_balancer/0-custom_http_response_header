@@ -1,28 +1,34 @@
 #!/usr/bin/env bash
-# Customizing a 404-error_page
+# configures a new Ubuntu machine
 
-# Updating Packages before performing installations
-sudo apt-get update
-sudo apt-get install -y nginx
+# Install nginx on web-01 server
+apt-get -y update
+apt-get -y install nginx
 
-# Creating an index.html page
-echo "Hello World!" | sudo tee /var/www/html/index.html
+# Add custom response header to know the server name for debugging
+HOST_NAME=$(hostname)
+HEADER="\\\n\tadd_header X-Served-By $HOST_NAME;\n"
+FIND=$(grep "X-Server-by" /etc/nginx/sites-available/default)
+if [[ -z $FIND ]]; then
+    sed -i "23i $HEADER" /etc/nginx/sites-available/default
+fi
 
-# Performing a "moved permanently redirection" (301)
-new_string="server_name _;\n\trewrite ^\/redirect_me https:\/\/github.com\/besthor permanent;"
-sudo sed -i "s/server_name _;/$new_string/" /etc/nginx/sites-enabled/default
+# Create a firts index.html page
+echo "Hello World!" > /var/www/html/index.html
 
-# Creating a 404 Custom error page
-echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
-new_string="listen 80 default_server;\n\terror_page 404 \/404.html;\n\tlocation = \/404.html {\n\t\troot \/var\/www\/html;\n\t\tinternal;\n\t}"
+# Add to the nginx configuration file a redirection to another page
+FIND=$(grep "redirect_me" /etc/nginx/sites-available/default)
+STRING="\\\n\tlocation /redirect_me {\n\t\t return 301 https://www.youtube.com/watch?v=3MbaGJN2ioQ;\n\t}\n"
+if [[ -z $FIND ]]; then
+    sed -i "42i $STRING" /etc/nginx/sites-available/default
+fi
 
-sudo sed -i "s/listen 80 default_server;/$new_string/" /etc/nginx/sites-enabled/default
+# Add to the nginx configuration file a error page 404
+FIND=$(grep "error_page 404" /etc/nginx/sites-available/default)
+ERROR="\\\n\terror_page 404 /custom_404.html;\n"
+if [[ -z $FIND ]]; then
+    echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
+    sed -i "40i $ERROR" /etc/nginx/sites-available/default
+fi
 
-# Creating an HTTP response header
-sudo sed -i "/server_name _/a add_header X-Served-By $HOSTNAME;" /etc/nginx/sites-enabled/default
-
-# Testing configurations for syntax errors
-sudo nginx -t
-
-# Restart nginx after implementing changes
-sudo service nginx restart
+service nginx restart
