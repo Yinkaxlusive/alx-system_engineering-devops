@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Set default incoming policy to deny
+sudo ufw default deny incoming
+
+# Allow incoming traffic on ports 22, 443, and 80
+sudo ufw allow 22/tcp
+sudo ufw allow 443/tcp
+sudo ufw allow 80/tcp
+
+# Enable UFW
+sudo ufw enable
+
+# Display UFW status
+sudo ufw status
