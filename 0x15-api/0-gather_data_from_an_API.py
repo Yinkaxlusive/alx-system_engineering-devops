@@ -49,4 +49,3 @@ if __name__ == "__main__":
         sys.exit(1)
 
     fetch_employee_todo_progress(employee_id)
-]
