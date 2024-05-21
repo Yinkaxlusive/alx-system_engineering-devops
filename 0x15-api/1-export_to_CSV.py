@@ -1,34 +1,35 @@
 #!/usr/bin/python3
-"""Exports to-do list information for a given employee ID to CSV format."""
 
+"""
+Python script that exports data in the CSV format
+"""
+
+from requests import get
+from sys import argv
 import csv
-import requests
-import sys
-
 
 if __name__ == "__main__":
-    # Get the user ID from the command-line arguments provided to the script
-    user_id = sys.argv[1]
+    response = get('https://jsonplaceholder.typicode.com/todos/')
+    data = response.json()
 
-    # Define the base URL for the JSON API
-    url = "https://jsonplaceholder.typicode.com/"
+    row = []
+    response2 = get('https://jsonplaceholder.typicode.com/users')
+    data2 = response2.json()
 
-    # Fetch user information from the API and
-    #   convert the response to a JSON object
-    user = requests.get(url + "users/{}".format(user_id)).json()
+    for i in data2:
+        if i['id'] == int(argv[1]):
+            employee = i['username']
 
-    # Extract the username from the user data
-    username = user.get("username")
+    with open(argv[1] + '.csv', 'w', newline='') as file:
+        writ = csv.writer(file, quoting=csv.QUOTE_ALL)
 
-    # Fetch the to-do list items associated with the
-    #   given user ID and convert the response to a JSON object
-    todos = requests.get(url + "todos", params={"userId": user_id}).json()
+        for i in data:
 
-    # Use list comprehension to iterate over the to-do list items
-    # Write each item's details (user ID, username, completion status,
-    #   and title) as a row in the CSV file
-    with open("{}.csv".format(user_id), "w", newline="") as csvfile:
-        writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
-        [writer.writerow(
-            [user_id, username, t.get("completed"), t.get("title")]
-         ) for t in todos]
+            row = []
+            if i['userId'] == int(argv[1]):
+                row.append(i['userId'])
+                row.append(employee)
+                row.append(i['completed'])
+                row.append(i['title'])
+
+                writ.writerow(row)
