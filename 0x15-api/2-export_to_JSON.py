@@ -1,43 +1,41 @@
 #!/usr/bin/python3
-"""
-Exports to-do list information for a given employee ID to JSON format.
 
-This script takes an employee ID as a command-line argument and exports
-the corresponding user information and to-do list to a JSON file.
+"""
+Python script that exports data in the JSON format.
 """
 
+from requests import get
+from sys import argv
 import json
-import requests
-import sys
-
 
 if __name__ == "__main__":
-    # Get the employee ID from the command-line argument
-    user_id = sys.argv[1]
+    response = get('https://jsonplaceholder.typicode.com/todos/')
+    data = response.json()
 
-    # Base URL for the JSONPlaceholder API
-    url = "https://jsonplaceholder.typicode.com/"
+    row = []
+    response2 = get('https://jsonplaceholder.typicode.com/users')
+    data2 = response2.json()
 
-    # Fetch user information using the provided employee ID
-    user = requests.get(url + "users/{}".format(user_id)).json()
-    username = user.get("username")
+    for i in data2:
+        if i['id'] == int(argv[1]):
+            u_name = i['username']
+            id_no = i['id']
 
-    # Fetch the to-do list for the employee using the provided employee ID
-    params = {"userId": user_id}
-    todos = requests.get(url + "todos", params).json()
+    row = []
 
-    # Create a dictionary containing the user and to-do list information
-    data_to_export = {
-        user_id: [
-            {
-                "task": t.get("title"),
-                "completed": t.get("completed"),
-                "username": username
-            }
-            for t in todos
-        ]
-    }
+    for i in data:
 
-    # Write the data to a JSON file with the employee ID as the filename
-    with open("{}.json".format(user_id), "w") as jsonfile:
-        json.dump(data_to_export, jsonfile, indent=4)
+        new_dict = {}
+
+        if i['userId'] == int(argv[1]):
+            new_dict['username'] = u_name
+            new_dict['task'] = i['title']
+            new_dict['completed'] = i['completed']
+            row.append(new_dict)
+
+    final_dict = {}
+    final_dict[id_no] = row
+    json_obj = json.dumps(final_dict)
+
+    with open(argv[1] + ".json",  "w") as f:
+        f.write(json_obj)
