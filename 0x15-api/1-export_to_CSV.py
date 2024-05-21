@@ -1,35 +1,39 @@
 #!/usr/bin/python3
-
-"""
-A Python script which exports data in the CSV format
+"""Python script that exports data in the CSV format
 """
 
-from requests import get
-from sys import argv
 import csv
+import requests
+from sys import argv
 
 if __name__ == "__main__":
-    response = get('https://jsonplaceholder.typicode.com/todos/')
-    data = response.json()
 
-    row = []
-    response2 = get('https://jsonplaceholder.typicode.com/users')
-    data2 = response2.json()
+    def make_request(resource, param=None):
+        """Retrieve user from API
+        """
+        url = 'https://jsonplaceholder.typicode.com/'
+        url += resource
+        if param:
+            url += ('?' + param[0] + '=' + param[1])
 
-    for i in data2:
-        if i['id'] == int(argv[1]):
-            employee = i['username']
+        # make request
+        r = requests.get(url)
 
-    with open(argv[1] + '.csv', 'w', newline='') as file:
-        writ = csv.writer(file, quoting=csv.QUOTE_ALL)
+        # extract json response
+        r = r.json()
+        return r
 
-        for i in data:
+    user = make_request('users', ('id', argv[1]))[0]
+    tasks = make_request('todos', ('userId', argv[1]))
 
-            row = []
-            if i['userId'] == int(argv[1]):
-                row.append(i['userId'])
-                row.append(employee)
-                row.append(i['completed'])
-                row.append(i['title'])
-
-                writ.writerow(row)
+    csv_filename = argv[1] + '.csv'
+    with open(csv_filename, mode='w') as f:
+        writer = csv.writer(f,
+                            delimiter=',',
+                            quotechar='"',
+                            quoting=csv.QUOTE_ALL)
+        for task in tasks:
+            writer.writerow([user['id'],
+                            user['username'],
+                            task['completed'],
+                            task['title']])
