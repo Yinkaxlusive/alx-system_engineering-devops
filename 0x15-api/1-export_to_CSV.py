@@ -1,45 +1,35 @@
 #!/usr/bin/python3
-""" A Python script that exports data in the CSV format """
+
+"""
+A Python script which exports data in the CSV format
+"""
+
+from requests import get
+from sys import argv
 import csv
-import json
-import sys
-import urllib
-import urllib.request
 
-# The base API url for getting the employee object
-USER_API_URL = "https://jsonplaceholder.typicode.com/users/"
+if __name__ == "__main__":
+    response = get('https://jsonplaceholder.typicode.com/todos/')
+    data = response.json()
 
-# The base API url for getting all todo objects for an employee
-TODO_API_URL = "https://jsonplaceholder.typicode.com/todos?userId="
+    row = []
+    response2 = get('https://jsonplaceholder.typicode.com/users')
+    data2 = response2.json()
 
-# Employee ID passed as an argument to the script
-emp_id: str = sys.argv[1] if len(sys.argv) > 1 else ""
+    for i in data2:
+        if i['id'] == int(argv[1]):
+            employee = i['username']
 
-# Get all the todos for a given employee ID
-if emp_id.isdigit():
-    try:
-        user_url = f"{USER_API_URL}{emp_id}"
-        todos_url = f"{TODO_API_URL}{emp_id}"
+    with open(argv[1] + '.csv', 'w', newline='') as file:
+        writ = csv.writer(file, quoting=csv.QUOTE_ALL)
 
-        emp_response = urllib.request.urlopen(user_url)
-        todos_response = urllib.request.urlopen(todos_url)
+        for i in data:
 
-        emp_data = emp_response.read()
-        todos_data = todos_response.read()
+            row = []
+            if i['userId'] == int(argv[1]):
+                row.append(i['userId'])
+                row.append(employee)
+                row.append(i['completed'])
+                row.append(i['title'])
 
-        employee = json.loads(emp_data)
-        todos = json.loads(todos_data)
-
-        username = employee.get("username")
-
-        with open(f"{emp_id}.csv", "w", newline="") as csvfile:
-            writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
-            for todo in todos:
-                todo_status = todo.get("completed")
-                todo_title = todo.get("title")
-                writer.writerow([emp_id, username, todo_status, todo_title])
-
-    except urllib.error.URLError as err:
-        print(f"An error occurred: {err}")
-    except json.JSONDecodeError as err:
-        print(f"Error decoding JSON: {err}")
+                writ.writerow(row)
