@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Python script that exports data in the CSV format
+"""Request the employee ID from API
 """
 
 import csv
