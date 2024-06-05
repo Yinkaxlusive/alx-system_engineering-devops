@@ -29,3 +29,4 @@ def top_ten(subreddit):
     except requests.RequestException:
         print(None)
 
+
