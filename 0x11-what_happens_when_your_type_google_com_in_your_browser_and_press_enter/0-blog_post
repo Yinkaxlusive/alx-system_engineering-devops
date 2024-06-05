@@ -1,17 +1,1 @@
-When you type "https://www.google.com" into your browser's address bar and hit Enter, a complex series of events unfold behind the scenes to bring you the Google homepage. In this blog post, we'll dive into the inner workings of the web stack and explore each step of this journey.
-1. DNS Request
-The journey begins with a Domain Name System (DNS) request. The browser sends a DNS query to a DNS server, asking for the IP address associated with "www.google.com." The DNS server responds with the IP address, allowing the browser to know where to send the request.
-2. TCP/IP
-Armed with the IP address, the browser initiates a Transmission Control Protocol (TCP) connection to the server hosting Google. TCP ensures reliable and ordered delivery of data packets over the internet. The Internet Protocol (IP) then handles routing and addressing to ensure the packets reach the correct destination.
-3. Firewall
-Before reaching Google's servers, the request may pass through firewalls. Firewalls act as a barrier, filtering incoming and outgoing traffic based on predefined security rules. They protect against unauthorized access and potential threats.
-4. HTTPS/SSL
-Modern web browsers use HTTPS (Hypertext Transfer Protocol Secure) to establish a secure connection with the server. HTTPS encrypts the data exchanged between the browser and the server, safeguarding it from eavesdropping and tampering. This encryption is made possible by SSL (Secure Sockets Layer) or its successor, TLS (Transport Layer Security).
-5. Load Balancer
-Large-scale websites like Google often employ load balancers to distribute incoming traffic across multiple servers. Load balancers improve performance, scalability, and reliability by evenly spreading the workload and preventing any single server from becoming overwhelmed.
-6. Web Server
-Upon reaching Google's web server, the browser's request is processed. The web server retrieves the requested resources, such as HTML, CSS, JavaScript, and media files, and prepares them for delivery to the browser.
-7. Application Server
-For dynamic content or server-side processing, the web server may interact with an application server. Application servers execute server-side scripts, handle database queries, and generate dynamic content based on user input or application logic.
-8. Database
-If the request requires data retrieval or storage, the application server communicates with a database server. The database server stores and manages structured data, such as user information, search results, and other application data.
+https://bit.ly/3wvhm18
