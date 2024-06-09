@@ -1,10 +1,14 @@
 Postmortem Report: Website Outage on June 1, 2024
+
 Issue Summary
 Duration of the Outage:
+
 June 1, 2024, 15:00 - 17:30 WAT
 Impact:
+
 The company's main e-commerce website was down, preventing all users from accessing the site. Approximately 100% of users were affected, resulting in an estimated loss of $20,000 in sales revenue during the downtime.
 Root Cause:
+
 A misconfiguration in the load balancer caused it to fail under high traffic, preventing traffic from being routed to healthy application servers.
 Timeline
 15:00 WAT: Issue detected by automated monitoring system alerting high error rates.
@@ -21,6 +25,7 @@ Timeline
 17:30 WAT: Confirmed system stable, incident closed.
 Root Cause and Resolution
 Root Cause:
+
 The load balancer was configured with incorrect settings that failed to handle the traffic spike during a promotional event. Specifically, the session persistence setting was misconfigured, causing the load balancer to overload and drop incoming traffic instead of distributing it evenly across the servers.
 Resolution:
 The configuration was corrected by updating the session persistence settings and adjusting the maximum connection limits. The load balancer was then restarted to apply the new settings.
